@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReplyAI — Priya's Bakery Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="global-toast" id="global-toast"></div>
+
+<!-- ADD ITEM MODAL -->
+<div class="modal-bg" id="add-modal">
+<div class="modal-box">
+  <div class="modal-title">Add New Menu Item</div>
+  <div class="modal-grid">
+    <div class="modal-field" style="grid-column:1/-1">
+      <label class="modal-label">Product Name</label>
+      <input class="modal-input" id="new-name" placeholder="e.g. Mango Cake">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Category</label>
+      <select class="modal-input" id="new-cat"><option>Cake</option><option>Cupcake</option><option>Brownie</option><option>Cookie</option><option>Snack</option></select>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Available Qty</label>
+      <input class="modal-input" id="new-qty" type="number" placeholder="5">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Max Capacity</label>
+      <input class="modal-input" id="new-max" type="number" placeholder="10">
+    </div>
+  </div>
+  <div class="modal-actions">
+    <button class="ie-btn ie-btn-cancel" onclick="hideAddModal()">Cancel</button>
+    <button class="ie-btn ie-btn-save" onclick="addNewItem()">Add Item</button>
+  </div>
+</div>
+</div>
+
+<!-- RESTOCK MODAL -->
+<div class="restock-modal" id="restock-modal">
+<div class="modal-box">
+  <div class="modal-title">⚠️ Restock Alert</div>
+  <div id="restock-content"></div>
+  <div class="modal-actions">
+    <button class="ie-btn ie-btn-save" onclick="document.getElementById('restock-modal').classList.remove('show')">Close</button>
+  </div>
+</div>
+</div>
+
+<header class="top-nav">
+  <div class="brand">Priya's Atelier</div>
+  <nav class="tabs">
+    <a class="tab active" id="nav-dashboard" onclick="switchView('dashboard')">Dashboard</a>
+    <a class="tab" id="nav-analytics" onclick="switchView('analytics')">Analytics</a>
+    <a class="tab" id="nav-stock" onclick="switchView('stock')">Menu & Stock</a>
+    <a class="tab" id="nav-orders" onclick="switchView('orders-mgmt')">Orders</a>
+    <a class="tab" id="nav-delivery" onclick="switchView('delivery')">Delivery</a>
+  </nav>
+  <div class="nav-right">
+    <div class="search-box"><i class="ri-search-line" style="color:#A8A198"></i><input type="text" placeholder="Search orders..."></div>
+    <i class="ri-notification-3-line" style="font-size:20px;color:var(--text-muted);cursor:pointer"></i>
+    <div class="avatar"><i class="ri-user-line"></i></div>
+  </div>
+</header>
+
+<div class="app-body">
+<aside class="sidebar">
+  <div class="side-header">
+    <h2>The Hearth</h2>
+    <p>PREMIUM ARTISANAL<br>DASHBOARD</p>
+  </div>
+  <ul class="side-menu">
+    <li class="active" onclick="sideNav('orders',this)"><i class="ri-file-list-3-line" style="color:var(--accent)"></i><span style="color:var(--accent)">ORDERS</span></li>
+    <li onclick="sideNav('ingredients',this)"><i class="ri-flask-line"></i>INGREDIENTS</li>
+    <li onclick="sideNav('inventory',this)"><i class="ri-inbox-archive-line"></i>INVENTORY</li>
+    <li onclick="sideNav('marketing',this)"><i class="ri-megaphone-line"></i>MARKETING</li>
+    <li onclick="sideNav('customers',this)"><i class="ri-group-line"></i>CUSTOMERS</li>
+    <li onclick="sideNav('orders-mgmt',this)"><i class="ri-shopping-bag-line"></i>ORDERS MGMT</li>
+    <li onclick="sideNav('delivery',this)"><i class="ri-truck-line"></i>DELIVERY</li>
+  </ul>
+  <div class="side-bottom">
+    <ul>
+      <li><i class="ri-magic-line"></i>AI INSIGHTS</li>
+      <li><i class="ri-question-fill"></i>HELP CENTER</li>
+    </ul>
+    <button class="btn-new-order">New Custom Order</button>
+  </div>
+</aside>
+
+<main class="content-area">
+
+<!-- DASHBOARD -->
+<div id="view-dashboard" class="view-section active">
+  <div id="side-orders" class="side-content active">
+    <div class="page-head">
+      <div>
+        <div class="head-label"><span class="dot-live"></span>LIVE DASHBOARD &bull; AUTO-REFRESHING</div>
+        <h1 class="page-title">ReplyAI Bakery Admin</h1>
+      </div>
+      <div style="font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:6px"><i class="ri-time-line"></i><span id="last-updated">Loading...</span></div>
+    </div>
+    <div class="metrics-row">
+      <div class="metric-card"><div class="m-title">TOTAL MESSAGES</div><div class="m-val" id="m-total">—</div></div>
+      <div class="metric-card"><div class="m-title">AUTO-RESOLVED</div><div class="m-val" id="m-resolved">—</div></div>
+      <div class="metric-card accent-edge"><div class="m-title">REVENUE PIPELINE</div><div class="m-val" id="m-revenue">—</div></div>
+      <div class="metric-card"><div class="m-title">AVG LEAD SCORE</div><div class="m-val" id="m-score">—</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card card-beige">
+        <div class="card-head"><h3 class="card-title">Sentiment Breakdown</h3></div>
+        <div id="sentiment-list"><div class="loading-wrap"><div class="spinner"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3 class="card-title">Action Required</h3><span class="link-red" onclick="showAllAlerts()">VIEW ALL ALERTS</span></div>
+        <div id="action-list"><div class="loading-wrap"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+    <div class="card" style="padding:32px 28px">
+      <div class="card-head" style="margin-bottom:24px">
+        <h3 class="card-title" style="font-size:18px">Recent Inbound Activity</h3>
+        <div class="filter-tabs">
+          <div class="f-tab active" onclick="filterMsg('all',this)">All</div>
+          <div class="f-tab" onclick="filterMsg('unresolved',this)">Unresolved</div>
+          <div class="f-tab" onclick="filterMsg('escalated',this)">Escalated</div>
+        </div>
+      </div>
+      <table class="tbl">
+        <thead><tr><th>CUSTOMER</th><th>PLATFORM</th><th>MESSAGE</th><th>AI REPLY</th><th>INTENT</th><th>SENTIMENT</th><th>SCORE</th></tr></thead>
+        <tbody id="msg-tbody"><tr><td colspan="7"><div class="loading-wrap"><div class="spinner"></div></div></td></tr></tbody>
+      </table>
+      <div class="load-more" id="load-more" style="display:none" onclick="loadMore()">Load more...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ANALYTICS -->
+<div id="view-analytics" class="view-section">
+  <div class="page-head"><div><h1 class="page-title">Analytics & Insights</h1><div class="page-desc">Track performance and customer inquiry trends across all platforms.</div></div></div>
+  
+  <!-- STAT CARDS -->
+  <div class="metrics-row">
+    <div class="metric-card"><div class="m-title">TOTAL CONVERSATIONS</div><div class="m-val" id="stat-conversations">—</div></div>
+    <div class="metric-card"><div class="m-title">RESOLUTION RATE</div><div class="m-val" id="stat-resolution">—</div></div>
+    <div class="metric-card accent-edge"><div class="m-title">TOP INTENT</div><div class="m-val" id="stat-top-intent">—</div></div>
+    <div class="metric-card"><div class="m-title">REVENUE PIPELINE</div><div class="m-val" id="stat-revenue">—</div></div>
+  </div>
+  
+  <!-- CHART 1 & 2 -->
+  <div class="grid-2">
+    <div class="card card-beige">
+      <div class="card-head"><h3 class="card-title">Messages by Intent</h3></div>
+      <div class="chart-container" style="height:250px"><canvas id="intentChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3 class="card-title">Sentiment Analysis</h3></div>
+      <div class="chart-container" style="height:250px"><canvas id="sentimentChart"></canvas></div>
+    </div>
+  </div>
+  
+  <!-- CHART 3 & 4 -->
+  <div class="grid-2">
+    <div class="card card-beige">
+      <div class="card-head"><h3 class="card-title">Lead Score Distribution</h3></div>
+      <div class="chart-container" style="height:220px"><canvas id="leadScoreChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3 class="card-title">Message Volume Over Time</h3></div>
+      <div class="chart-container" style="height:220px"><canvas id="volumeChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- MENU & STOCK -->
+<div id="view-stock" class="view-section">
+  <div class="page-head">
+    <div>
+      <div class="head-label" style="color:var(--accent)">STOCK MANAGEMENT</div>
+      <h1 class="page-title">The Daily Batch & <span style="color:var(--accent);margin-left:8px">Live Inventory</span></h1>
+      <div class="page-desc">Manage your artisanal creations and track shelf availability.</div>
+    </div>
+    <div style="display:flex;gap:16px">
+      <button class="btn-main btn-o" onclick="exportCSV()"><i class="ri-download-2-line"></i>Export CSV</button>
+      <button class="btn-main btn-r" onclick="showAddModal()"><i class="ri-add-line"></i>Add Item</button>
+    </div>
+  </div>
+  <div class="grid-stock">
+    <div class="card-low">
+      <div class="low-icon"><i class="ri-shopping-cart-line"></i></div>
+      <div style="font-size:10px;font-weight:700;margin-bottom:12px;letter-spacing:.5px">LOW STOCK<br>ALERT</div>
+      <div class="low-num" id="low-stock-num">—</div>
+      <div class="low-lbl">Products below 30%</div>
+    </div>
+    <div class="stock-list">
+      <div class="st-head">
+        <div class="st-col">PRODUCT</div><div class="st-col">CATEGORY</div>
+        <div class="st-col">STOCK LEVEL</div><div class="st-col">ACTION</div>
+      </div>
+      <div id="stock-tbody"><div class="loading-wrap"><div class="spinner"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- INGREDIENTS (sidebar) -->
+<div id="view-ingredients" class="view-section">
+  <div class="page-head">
+    <div><h1 class="page-title">Ingredient Tracker</h1><div class="page-desc">Manage raw materials and track bakery staples.</div></div>
+    <button class="btn-main btn-r" onclick="showRestockAlert()"><i class="ri-alarm-warning-line"></i>Restock Alert</button>
+  </div>
+  <div class="card">
+    <table class="ing-tbl">
+      <thead><tr><th>INGREDIENT</th><th>USED IN</th><th>STOCK STATUS</th></tr></thead>
+      <tbody id="ing-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- INVENTORY (sidebar) -->
+<div id="view-inventory" class="view-section">
+  <div class="page-head">
+    <div><h1 class="page-title">Full Inventory Overview</h1><div class="page-desc">Complete stock overview synced with Airtable.</div></div>
+    <button class="btn-main btn-r" onclick="showAddModal()"><i class="ri-add-line"></i>Add Item</button>
+  </div>
+  <div class="inv-stats">
+    <div class="inv-stat"><div class="inv-stat-val" id="inv-total">—</div><div class="inv-stat-lbl">Total Items</div></div>
+    <div class="inv-stat"><div class="inv-stat-val" id="inv-low">—</div><div class="inv-stat-lbl">Low Stock Count</div></div>
+    <div class="inv-stat"><div class="inv-stat-val" id="inv-value">—</div><div class="inv-stat-lbl">Total Stock Value</div></div>
+  </div>
+  <div class="card">
+    <div class="st-head"><div class="st-col">PRODUCT</div><div class="st-col">CATEGORY</div><div class="st-col">STOCK LEVEL</div><div class="st-col">ACTION</div></div>
+    <div id="inv-tbody"><div class="loading-wrap"><div class="spinner"></div></div></div>
+  </div>
+</div>
+
+<!-- MARKETING (sidebar) -->
+<div id="view-marketing" class="view-section">
+  <div class="page-head"><div><h1 class="page-title">Marketing & Lead Intelligence</h1><div class="page-desc">Follow up on leads and track high-value customers.</div></div></div>
+  <div class="mkt-grid">
+    <div class="mkt-card">
+      <div class="mkt-card-title"><i class="ri-fire-fill" style="color:var(--accent)"></i>Hot Leads (Score 8+)</div>
+      <div id="hot-leads"><div class="loading-wrap"><div class="spinner"></div></div></div>
+    </div>
+    <div class="mkt-card">
+      <div class="mkt-card-title"><i class="ri-send-plane-fill" style="color:var(--teal)"></i>Follow-up Queue</div>
+      <div id="followup-list"><div class="loading-wrap"><div class="spinner"></div></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3 class="card-title">Quick Reply Templates</h3></div>
+    <button class="template-btn" onclick="copyTemplate('Hi! Just checking in about your cake inquiry. We have slots available this weekend. Would you like to confirm your order?')">📋 Follow-up: Price inquiry</button>
+    <button class="template-btn" onclick="copyTemplate('Your order is confirmed! We need 2 days advance notice. Please share your delivery address and preferred time.')">📋 Order confirmation request</button>
+    <button class="template-btn" onclick="copyTemplate('We have eggless options for all our cakes! Prices start from ₹450. Would you like to see our full menu?')">📋 Eggless inquiry response</button>
+    <button class="template-btn" onclick="copyTemplate('We deliver within 10km of Jubilee Hills, Hyderabad for a flat ₹50 charge. Is your area within range?')">📋 Delivery inquiry response</button>
+  </div>
+</div>
+
+<!-- CUSTOMERS (sidebar) -->
+<div id="view-customers" class="view-section">
+  <div class="page-head">
+    <div><h1 class="page-title">Customer Intelligence</h1><div class="page-desc">Complete overview of all incoming requests and conversations.</div></div>
+    <button class="btn-main btn-o" onclick="exportConvsCSV()"><i class="ri-download-2-line"></i>Export CSV</button>
+  </div>
+  <div class="card">
+    <input class="cust-search" id="cust-search" placeholder="Search by name..." oninput="filterCustomers(this.value)">
+    <table class="tbl">
+      <thead><tr><th>CUSTOMER</th><th>PLATFORM</th><th>LAST MESSAGE</th><th>INTENT</th><th>SCORE</th><th>SENTIMENT</th><th>STATUS</th><th>TIME</th></tr></thead>
+      <tbody id="cust-tbody"><tr><td colspan="8"><div class="loading-wrap"><div class="spinner"></div></div></td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ORDERS MANAGEMENT -->
+<div id="view-orders-mgmt" class="view-section">
+  <div class="page-head">
+    <div><h1 class="page-title">Order Management</h1><div class="page-desc">Track and manage all customer orders in one place.</div></div>
+  </div>
+  <div class="metrics-row">
+    <div class="metric-card"><div class="m-title">TOTAL ORDERS</div><div class="m-val" id="om-total">—</div></div>
+    <div class="metric-card"><div class="m-title">PENDING</div><div class="m-val" id="om-pending">—</div></div>
+    <div class="metric-card accent-edge"><div class="m-title">BAKING TODAY</div><div class="m-val" id="om-baking">—</div></div>
+    <div class="metric-card"><div class="m-title">DELIVERED TODAY</div><div class="m-val" id="om-delivered">—</div></div>
+  </div>
+  <div class="card">
+    <table class="tbl">
+      <thead><tr><th>ORDER ID</th><th>CUSTOMER</th><th>PLATFORM</th><th>CAKE TYPE</th><th>TOTAL PRICE</th><th>DELIVERY DATE</th><th>ORDER STATUS</th><th>PAYMENT</th><th>ACTION</th></tr></thead>
+      <tbody id="orders-tbody"><tr><td colspan="9"><div class="loading-wrap"><div class="spinner"></div></div></td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- DELIVERY TRACKING -->
+<div id="view-delivery" class="view-section">
+  <div class="page-head">
+    <div><h1 class="page-title">Delivery Tracker</h1><div class="page-desc">Monitor all deliveries and track driver locations.</div></div>
+  </div>
+  <div class="metrics-row">
+    <div class="metric-card"><div class="m-title">SCHEDULED TODAY</div><div class="m-val" id="dt-scheduled">—</div></div>
+    <div class="metric-card"><div class="m-title">ON THE WAY</div><div class="m-val" id="dt-ontheway">—</div></div>
+    <div class="metric-card accent-edge"><div class="m-title">DELIVERED TODAY</div><div class="m-val" id="dt-delivered">—</div></div>
+  </div>
+  <div class="card">
+    <table class="tbl">
+      <thead><tr><th>ORDER ID</th><th>CUSTOMER</th><th>PHONE</th><th>ADDRESS</th><th>DELIVERY DATE</th><th>STATUS</th><th>ETA</th><th>DRIVER</th><th>ACTION</th></tr></thead>
+      <tbody id="delivery-tbody"><tr><td colspan="9"><div class="loading-wrap"><div class="spinner"></div></div></td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/stock.js"></script>
+<script src="js/orders.js"></script>
+<script src="js/delivery.js"></script>
+<script src="js/customers.js"></script>
+<script src="js/marketing.js"></script>
+<script src="js/ingredients.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
