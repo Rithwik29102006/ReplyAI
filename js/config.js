@@ -1,4 +1,4 @@
-const TOKEN = 'patpwdpJLQBm15v3V.8e7639cc74382ba24d602c8036074c18c4e672a189ffb5437e061ccb49125b78'; 
+const TOKEN = 'patpwdpJLQBm15v3V.8e7639cc74382ba24d602c8036074c18c4e672a189ffb5437e061ccb49125b78';
 const BASE = 'appq0ev1rvBz2jLAy';
 const CONV = 'tblHBMLHsz6XBKmyZ';
 const STOCK = 'tblYKh6qPeuuhbxVB';
