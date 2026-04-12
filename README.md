@@ -2,7 +2,7 @@
 
 > **Built for CodeQuest 2026** | SaaS / Communication Automation Track
 
-[![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-View%20Now-B23D22?style=for-the-badge)](https://replyai-bakery.netlify.app)
+[![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-View%20Now-B23D22?style=for-the-badge)](https://replyaibakery1.netlify.app/)
 [![n8n Workflow](https://img.shields.io/badge/n8n-Workflow%20Automation-FF6D5A?style=for-the-badge)](https://n8n.io)
 [![Airtable](https://img.shields.io/badge/Airtable-Database-18BFFF?style=for-the-badge)](https://airtable.com)
 [![Twilio](https://img.shields.io/badge/Twilio-WhatsApp%20API-F22F46?style=for-the-badge)](https://twilio.com)
