@@ -29,6 +29,8 @@ function switchView(v) {
   document.getElementById('nav-' + v).classList.add('active');
   if (v === 'analytics') setTimeout(renderAnalyticsView, 100);
   if (v === 'stock') renderStockView();
+  if (v === 'orders-mgmt') setTimeout(() => renderOrdersView(), 100);
+  if (v === 'delivery') setTimeout(() => renderDeliveryView(), 100);
 }
 
 function sideNav(view, el) {
@@ -42,6 +44,11 @@ function sideNav(view, el) {
   if (view === 'orders') {
     document.getElementById('view-dashboard').classList.add('active');
     document.getElementById('nav-dashboard').classList.add('active');
+  } else if (view === 'settings') {
+    document.getElementById('view-settings').classList.add('active');
+    loadSettings();
+  } else if (view === 'simulator') {
+    document.getElementById('view-simulator').classList.add('active');
   } else {
     document.getElementById('view-' + view).classList.add('active');
   }
@@ -49,8 +56,8 @@ function sideNav(view, el) {
   if (view === 'inventory') renderInventoryView();
   if (view === 'marketing') renderMarketing();
   if (view === 'customers') renderCustomers();
-  if (view === 'orders-mgmt') renderOrdersView();
-  if (view === 'delivery') renderDeliveryView();
+  if (view === 'orders-mgmt') setTimeout(() => renderOrdersView(), 100);
+  if (view === 'delivery') setTimeout(() => renderDeliveryView(), 100);
 }
 
 // DASHBOARD

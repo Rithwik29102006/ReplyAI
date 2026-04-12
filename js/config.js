@@ -1,9 +1,9 @@
-const TOKEN = 'YOUR_AIRTABLE_TOKEN_HERE'; // Replace with your Airtable personal access token
+const TOKEN = 'patpwdpJLQBm15v3V.8e7639cc74382ba24d602c8036074c18c4e672a189ffb5437e061ccb49125b78'; 
 const BASE = 'appq0ev1rvBz2jLAy';
 const CONV = 'tblHBMLHsz6XBKmyZ';
 const STOCK = 'tblYKh6qPeuuhbxVB';
 const ORDERS = 'tblNBHONiupSnyX2g';
-const DELIVERY = 'tblYYYYY';
+const DELIVERY = 'tblNBHONiupSnyX2g';
 const H = {'Authorization':'Bearer '+TOKEN,'Content-Type':'application/json'};
 const ICOLORS = {PRICE:'#5A4FCF',ORDER:'#B23D22',CUSTOMIZATION:'#9C3558',DELIVERY:'#197280',AVAILABILITY:'#208754',SUPPORT:'#C5221F'};
 const CATICONS = {Cake:'🎂',Cupcake:'🧁',Brownie:'🍫',Cookie:'🍪',Snack:'🥐',GENERAL:'📦'};

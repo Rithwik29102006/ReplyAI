@@ -1,11 +1,29 @@
 // Airtable fetch/patch/create functions
 
+// Fetch with timeout wrapper
+async function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(timer);
+    return res;
+  } catch (e) {
+    clearTimeout(timer);
+    if (e.name === 'AbortError') {
+      throw new Error('Request timed out after ' + timeoutMs + 'ms');
+    }
+    throw e;
+  }
+}
+
 // Fetch all records from a table with pagination
 async function fetchAll(tableId) {
+  if (!tableId || tableId === 'tblYYYYY') return [];
   let records = [], offset = null;
   do {
     const url = `https://api.airtable.com/v0/${BASE}/${tableId}?pageSize=100${offset ? '&offset=' + offset : ''}`;
-    const res = await fetch(url, { headers: H });
+    const res = await fetchWithTimeout(url, { headers: H }, 8000);
     if (!res.ok) throw new Error('API ' + res.status);
     const data = await res.json();
     records = records.concat(data.records || []);
@@ -51,23 +69,22 @@ async function reloadStock() {
   }
 }
 
-// Load all data
+// Load all data (except orders - loaded separately)
 async function loadData() {
   try {
-    const cr = await fetchAll(CONV).catch(() => []);
-    const sr = await fetchAll(STOCK).catch(() => []);
-    const or = await fetchAll(ORDERS).catch(() => []);
+    const [cr, sr] = await Promise.all([
+      fetchAll(CONV).catch(() => []),
+      fetchAll(STOCK).catch(() => [])
+    ]);
     cachedConvs = cr.map(r => ({ id: r.id, ...r.fields }));
     cachedStocks = sr.map(r => ({ id: r.id, ...r.fields }));
-    cachedOrders = or.map(r => ({ id: r.id, ...r.fields }));
-    cachedDeliveries = [];
     document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
     renderDashboard();
     renderAnalyticsView();
     renderStockView();
   } catch (e) {
+    console.error('Load error:', e);
     document.getElementById('last-updated').textContent = 'Error — check connection';
-    console.error(e);
   }
 }
 

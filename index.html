@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ReplyAI — Priya's Bakery Admin</title>
+  <title>ReplyAI — Business Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -11,7 +11,221 @@
 </head>
 <body>
 
+<!-- TEMPORARY TEST BUTTON -->
+<button onclick="localStorage.clear();location.reload()" style="position:fixed;top:10px;right:10px;z-index:9999;background:red;color:white;padding:8px;border:none;cursor:pointer;border-radius:4px;font-weight:bold">Reset Onboarding</button>
+
 <div class="global-toast" id="global-toast"></div>
+
+<!-- BUSINESS ONBOARDING MODAL -->
+<div class="onboarding-modal" id="onboarding-modal">
+  <div class="onboarding-container">
+    <div class="onboarding-progress">
+      <div class="onboarding-step active" id="step-indicator-1">1</div>
+      <div class="onboarding-step" id="step-indicator-2">2</div>
+      <div class="onboarding-step" id="step-indicator-3">3</div>
+      <div class="onboarding-step" id="step-indicator-4">4</div>
+    </div>
+    
+    <!-- Step 1: Business Basics -->
+    <div class="onboarding-step-content" id="onboarding-step-1">
+      <div class="onboarding-title">Welcome to ReplyAI! 🏪</div>
+      <div class="onboarding-subtitle">Let's set up your business profile</div>
+      <div class="onboarding-form">
+        <div class="onboarding-field">
+          <label>Business Name</label>
+          <input type="text" id="input-business-name" placeholder="e.g., Priya's Bakery">
+        </div>
+        <div class="onboarding-field">
+          <label>Business Type</label>
+          <select id="input-business-type" onchange="onBusinessTypeChange(this.value)">
+            <option value="">Select type...</option>
+            <option value="Bakery">Bakery</option>
+            <option value="Tiffin Service">Tiffin Service</option>
+            <option value="Boutique">Boutique</option>
+            <option value="Salon">Salon</option>
+            <option value="Tuition Center">Tuition Center</option>
+            <option value="Event Decorator">Event Decorator</option>
+            <option value="Freelancer">Freelancer</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="onboarding-field">
+          <label>Owner Name</label>
+          <input type="text" id="input-owner-name" placeholder="Your name">
+        </div>
+        <div class="onboarding-field">
+          <label>WhatsApp Number</label>
+          <input type="text" id="input-whatsapp-number" placeholder="+91 98765 43210">
+        </div>
+        <div class="onboarding-field">
+          <label>Working Hours</label>
+          <input type="text" id="input-working-hours" placeholder="e.g., 9 AM - 8 PM, Mon-Sat">
+        </div>
+      </div>
+      <button class="onboarding-btn" onclick="nextOnboardingStep(2)">Continue</button>
+    </div>
+    
+    <!-- Step 2: Products/Services -->
+    <div class="onboarding-step-content" id="onboarding-step-2" style="display:none">
+      <div class="onboarding-title">Products & Services 📦</div>
+      <div class="onboarding-subtitle">What do you offer?</div>
+      <div id="products-list">
+        <div class="product-row">
+          <input type="text" placeholder="Product/Service Name" class="product-name">
+          <input type="text" placeholder="Price" class="product-price">
+          <input type="text" placeholder="Description" class="product-desc">
+        </div>
+      </div>
+      <button class="onboarding-btn-secondary" onclick="addProductRow()">+ Add More</button>
+      <div class="onboarding-nav">
+        <button class="onboarding-btn-outline" onclick="nextOnboardingStep(1)">Back</button>
+        <button class="onboarding-btn" onclick="nextOnboardingStep(3)">Continue</button>
+      </div>
+    </div>
+    
+    <!-- Step 3: Business Policies -->
+    <div class="onboarding-step-content" id="onboarding-step-3" style="display:none">
+      <div class="onboarding-title">Business Policies 📋</div>
+      <div class="onboarding-subtitle">Delivery & service terms</div>
+      <div class="onboarding-form">
+        <div class="onboarding-field">
+          <label>Delivery Area</label>
+          <input type="text" id="input-delivery-area" placeholder="e.g., Within 10km of Jubilee Hills">
+        </div>
+        <div class="onboarding-field">
+          <label>Delivery Charge (₹)</label>
+          <input type="number" id="input-delivery-charge" placeholder="50">
+        </div>
+        <div class="onboarding-field">
+          <label>Advance Notice Required</label>
+          <input type="text" id="input-advance-notice" placeholder="e.g., 2 days">
+        </div>
+        <div class="onboarding-field">
+          <label>Special Instructions</label>
+          <textarea id="input-special-instructions" placeholder="Any special policies or instructions..."></textarea>
+        </div>
+        <div class="onboarding-field-checkbox" id="eggless-field" style="display:none">
+          <input type="checkbox" id="input-eggless">
+          <label>Eggless/Vegan options available</label>
+        </div>
+      </div>
+      <div class="onboarding-nav">
+        <button class="onboarding-btn-outline" onclick="nextOnboardingStep(2)">Back</button>
+        <button class="onboarding-btn" onclick="nextOnboardingStep(4)">Continue</button>
+      </div>
+    </div>
+    
+    <!-- Step 4: Confirmation -->
+    <div class="onboarding-step-content" id="onboarding-step-4" style="display:none">
+      <div class="onboarding-title">All Set! ✅</div>
+      <div class="onboarding-subtitle">Review your business profile</div>
+      <div class="onboarding-summary" id="onboarding-summary">
+        <!-- Summary will be populated dynamically -->
+      </div>
+      <div class="onboarding-nav">
+        <button class="onboarding-btn-outline" onclick="nextOnboardingStep(3)">Back</button>
+        <button class="onboarding-btn launch" onclick="completeOnboarding()">🚀 Launch Dashboard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IMPACT SCREEN OVERLAY -->
+<div class="impact-overlay" id="impact-overlay">
+  <div class="impact-container">
+    <button class="impact-close" onclick="closeImpactScreen()">×</button>
+    <div class="impact-header">
+      <h1>📊 ReplyAI Impact</h1>
+      <p>See how much time and money you can save</p>
+    </div>
+    <div class="impact-comparison">
+      <div class="impact-side before">
+        <h2>⏱️ BEFORE ReplyAI</h2>
+        <div class="impact-stat">
+          <span class="impact-value">2-4 hours</span>
+          <span class="impact-label">Response time</span>
+        </div>
+        <div class="impact-stat">
+          <span class="impact-value red">25-40%</span>
+          <span class="impact-label">Lead drop-off</span>
+        </div>
+        <div class="impact-stat">
+          <span class="impact-value">3-5 hours</span>
+          <span class="impact-label">Hours lost daily</span>
+        </div>
+        <div class="impact-stat">
+          <span class="impact-value red">₹9,750</span>
+          <span class="impact-label">Revenue lost daily</span>
+        </div>
+        <div class="impact-stat">
+          <span class="impact-value">100%</span>
+          <span class="impact-label">Manual work</span>
+        </div>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-side after">
+        <h2>⚡ AFTER ReplyAI</h2>
+        <div class="impact-stat">
+          <span class="impact-value green">5 seconds</span>
+          <span class="impact-label">Response time</span>
+        </div>
+        <div class="impact-stat">
+          <span class="impact-value green">95%+</span>
+          <span class="impact-label">Leads recovered</span>
+        </div>
+        <div class="impact-stat">
+          <span class="impact-value green">3-5 hours</span>
+          <span class="impact-label">Hours saved daily</span>
+        </div>
+        <div class="impact-stat">
+          <span class="impact-value green">₹9,750</span>
+          <span class="impact-label">Saved daily</span>
+        </div>
+        <div class="impact-stat">
+          <span class="impact-value green">88%+</span>
+          <span class="impact-label">Automated</span>
+        </div>
+      </div>
+    </div>
+    <div class="roi-calculator">
+      <h3>💰 ROI Calculator</h3>
+      <div class="roi-inputs">
+        <div class="roi-input">
+          <label>Messages per day</label>
+          <input type="range" id="roi-messages" min="10" max="200" value="50" oninput="updateROI()">
+          <span id="roi-messages-val">50</span>
+        </div>
+        <div class="roi-input">
+          <label>Average order value (₹)</label>
+          <input type="range" id="roi-order-value" min="100" max="5000" value="1000" step="100" oninput="updateROI()">
+          <span id="roi-order-val">₹1,000</span>
+        </div>
+        <div class="roi-input">
+          <label>Current drop-off %</label>
+          <input type="range" id="roi-dropoff" min="10" max="50" value="30" oninput="updateROI()">
+          <span id="roi-dropoff-val">30%</span>
+        </div>
+      </div>
+      <div class="roi-outputs">
+        <div class="roi-output">
+          <span class="roi-output-value" id="roi-monthly">₹45,000</span>
+          <span class="roi-output-label">Monthly recovered</span>
+        </div>
+        <div class="roi-output">
+          <span class="roi-output-value" id="roi-annual">₹5,40,000</span>
+          <span class="roi-output-label">Annual savings</span>
+        </div>
+        <div class="roi-output">
+          <span class="roi-output-value" id="roi-hours">1,095 hours</span>
+          <span class="roi-output-label">Hours saved/year</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IMPACT FLOATING BUTTON -->
+<button class="impact-float-btn" onclick="openImpactScreen()">📊 Impact</button>
 
 <!-- ADD ITEM MODAL -->
 <div class="modal-bg" id="add-modal">
@@ -54,26 +268,27 @@
 </div>
 
 <header class="top-nav">
-  <div class="brand">Priya's Atelier</div>
+  <div class="brand" id="nav-brand">ReplyAI</div>
   <nav class="tabs">
     <a class="tab active" id="nav-dashboard" onclick="switchView('dashboard')">Dashboard</a>
     <a class="tab" id="nav-analytics" onclick="switchView('analytics')">Analytics</a>
     <a class="tab" id="nav-stock" onclick="switchView('stock')">Menu & Stock</a>
     <a class="tab" id="nav-orders" onclick="switchView('orders-mgmt')">Orders</a>
     <a class="tab" id="nav-delivery" onclick="switchView('delivery')">Delivery</a>
+    <a class="tab" id="nav-simulator" onclick="switchView('simulator')">Simulator</a>
   </nav>
   <div class="nav-right">
     <div class="search-box"><i class="ri-search-line" style="color:#A8A198"></i><input type="text" placeholder="Search orders..."></div>
     <i class="ri-notification-3-line" style="font-size:20px;color:var(--text-muted);cursor:pointer"></i>
-    <div class="avatar"><i class="ri-user-line"></i></div>
+    <div class="avatar" id="nav-avatar"><i class="ri-user-line"></i></div>
   </div>
 </header>
 
 <div class="app-body">
 <aside class="sidebar">
   <div class="side-header">
-    <h2>The Hearth</h2>
-    <p>PREMIUM ARTISANAL<br>DASHBOARD</p>
+    <h2 id="side-business-name">The Hearth</h2>
+    <p id="side-subtitle">PREMIUM ARTISANAL<br>DASHBOARD</p>
   </div>
   <ul class="side-menu">
     <li class="active" onclick="sideNav('orders',this)"><i class="ri-file-list-3-line" style="color:var(--accent)"></i><span style="color:var(--accent)">ORDERS</span></li>
@@ -88,6 +303,7 @@
     <ul>
       <li><i class="ri-magic-line"></i>AI INSIGHTS</li>
       <li><i class="ri-question-fill"></i>HELP CENTER</li>
+      <li onclick="sideNav('settings',this)"><i class="ri-settings-3-line"></i>SETTINGS</li>
     </ul>
     <button class="btn-new-order">New Custom Order</button>
   </div>
@@ -308,6 +524,188 @@
       <thead><tr><th>ORDER ID</th><th>CUSTOMER</th><th>PHONE</th><th>ADDRESS</th><th>DELIVERY DATE</th><th>STATUS</th><th>ETA</th><th>DRIVER</th><th>ACTION</th></tr></thead>
       <tbody id="delivery-tbody"><tr><td colspan="9"><div class="loading-wrap"><div class="spinner"></div></div></td></tr></tbody>
     </table>
+  </div>
+</div>
+
+<!-- SIMULATOR VIEW -->
+<div id="view-simulator" class="view-section">
+  <div class="page-head">
+    <div>
+      <div class="head-label" style="color:var(--accent)">WHATSAPP SIMULATOR</div>
+      <h1 class="page-title">Test Your AI Assistant <span style="color:var(--accent);margin-left:8px">🤖</span></h1>
+      <div class="page-desc">Simulate customer conversations and see how ReplyAI responds.</div>
+    </div>
+  </div>
+  
+  <div class="simulator-container">
+    <div class="simulator-api-key">
+      <label>Groq API Key:</label>
+      <input type="text" id="groq-api-key" placeholder="Enter your Groq API key" value="gsk_T1cjz5M3sXvUU0wzMrMBWGdyb3FYXkh">
+      <button class="btn-main btn-r" onclick="saveGroqKey()">Save</button>
+    </div>
+    
+    <div class="simulator-chat">
+      <div class="chat-header">
+        <span class="chat-business-name" id="sim-business-name">Your Business</span>
+        <span class="chat-status">● Online</span>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-empty">Start a conversation by typing a message or using quick-send buttons below.</div>
+      </div>
+      <div class="chat-quick-send">
+        <button class="quick-btn" onclick="sendQuickMessage('How much for a chocolate cake?')">How much for a chocolate cake?</button>
+        <button class="quick-btn" onclick="sendQuickMessage('Do you deliver to Gachibowli?')">Do you deliver to Gachibowli?</button>
+        <button class="quick-btn" onclick="sendQuickMessage('I want to place an order')">I want to place an order</button>
+        <button class="quick-btn" onclick="sendQuickMessage('What flavours are available?')">What flavours are available?</button>
+        <button class="quick-btn" onclick="sendQuickMessage('Can you make eggless?')">Can you make eggless?</button>
+      </div>
+      <div class="chat-input">
+        <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatKeypress(event)">
+        <button class="chat-send" onclick="sendChatMessage()">
+          <i class="ri-send-plane-fill"></i>
+        </button>
+      </div>
+      <button class="chat-clear" onclick="clearChat()">Clear Chat</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS VIEW -->
+<div id="view-settings" class="view-section">
+  <div class="page-head">
+    <div>
+      <div class="head-label" style="color:var(--accent)">CONFIGURATION</div>
+      <h1 class="page-title">Business Settings <span style="color:var(--accent);margin-left:8px">⚙️</span></h1>
+      <div class="page-desc">Manage your business profile and integrations.</div>
+    </div>
+  </div>
+  
+  <div class="settings-grid">
+    <div class="card">
+      <div class="card-head"><h3 class="card-title">Business Information</h3></div>
+      <div class="settings-form">
+        <div class="settings-field">
+          <label>Business Name</label>
+          <input type="text" id="settings-business-name">
+        </div>
+        <div class="settings-field">
+          <label>Business Type</label>
+          <select id="settings-business-type">
+            <option value="Bakery">Bakery</option>
+            <option value="Tiffin Service">Tiffin Service</option>
+            <option value="Boutique">Boutique</option>
+            <option value="Salon">Salon</option>
+            <option value="Tuition Center">Tuition Center</option>
+            <option value="Event Decorator">Event Decorator</option>
+            <option value="Freelancer">Freelancer</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="settings-field">
+          <label>Owner Name</label>
+          <input type="text" id="settings-owner-name">
+        </div>
+        <div class="settings-field">
+          <label>WhatsApp Number</label>
+          <input type="text" id="settings-whatsapp">
+        </div>
+        <div class="settings-field">
+          <label>Working Hours</label>
+          <input type="text" id="settings-hours">
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-head"><h3 class="card-title">Products & Services</h3></div>
+      <div id="settings-products">
+        <!-- Dynamic product rows -->
+      </div>
+      <button class="onboarding-btn-secondary" onclick="addSettingsProductRow()">+ Add Product</button>
+    </div>
+    
+    <div class="card">
+      <div class="card-head"><h3 class="card-title">Business Policies</h3></div>
+      <div class="settings-form">
+        <div class="settings-field">
+          <label>Delivery Area</label>
+          <input type="text" id="settings-delivery-area">
+        </div>
+        <div class="settings-field">
+          <label>Delivery Charge (₹)</label>
+          <input type="number" id="settings-delivery-charge">
+        </div>
+        <div class="settings-field">
+          <label>Advance Notice</label>
+          <input type="text" id="settings-advance-notice">
+        </div>
+        <div class="settings-field">
+          <label>Special Instructions</label>
+          <textarea id="settings-special-instructions"></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-head"><h3 class="card-title">Airtable Integration</h3></div>
+      <div class="settings-form">
+        <div class="settings-field">
+          <label>Airtable Token</label>
+          <input type="text" id="settings-airtable-token" value="patpwdpJLQBm15v3V.8e7639cc74382ba24d602c8036074c18c4e672a189ffb5437e061ccb49125b78">
+        </div>
+        <div class="settings-field">
+          <label>Base ID</label>
+          <input type="text" id="settings-base-id" value="appq0ev1rvBz2jLAy">
+        </div>
+        <div class="settings-field">
+          <label>Conversations Table ID</label>
+          <input type="text" id="settings-conv-table" value="tblHBMLHsz6XBKmyZ">
+        </div>
+        <div class="settings-field">
+          <label>Stock Table ID</label>
+          <input type="text" id="settings-stock-table" value="tblYKh6qPeuuhbxVB">
+        </div>
+        <div class="settings-field">
+          <label>Orders Table ID</label>
+          <input type="text" id="settings-orders-table" value="tblNBHONiupSnyX2g">
+        </div>
+        <div class="settings-field">
+          <label>WhatsApp Webhook URL</label>
+          <input type="text" id="settings-webhook" value="https://rithwikreddy.app.n8n.cloud/webhook/send-whatsapp">
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="settings-actions">
+    <button class="btn-main btn-r" onclick="saveSettings()">Save Changes</button>
+    <button class="btn-main btn-o" onclick="resetOnboarding()">Reset & Reconfigure</button>
+  </div>
+</div>
+
+<!-- SOCIAL IMPACT COUNTER -->
+<div class="social-impact" id="social-impact">
+  <div class="impact-counter">
+    <div class="counter-item">
+      <span class="counter-icon">🏪</span>
+      <span class="counter-value" data-target="63">0</span>
+      <span class="counter-label">Million micro-SMEs can use ReplyAI</span>
+    </div>
+    <div class="counter-item">
+      <span class="counter-icon">⏰</span>
+      <span class="counter-value" data-target="5">0</span>
+      <span class="counter-label">Hours saved daily per business</span>
+    </div>
+    <div class="counter-item">
+      <span class="counter-icon">💰</span>
+      <span class="counter-value" data-target="292500">0</span>
+      <span class="counter-label">Recovered monthly per business</span>
+    </div>
+    <div class="counter-item">
+      <span class="counter-icon">🤖</span>
+      <span class="counter-value" data-target="88">0</span>
+      <span class="counter-label">% messages handled automatically</span>
+    </div>
   </div>
 </div>
 

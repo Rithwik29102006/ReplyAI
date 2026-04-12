@@ -1,34 +1,19 @@
 // Delivery tracking functions
 
-function renderDeliveryView() {
-  const d = cachedDeliveries;
-  const today = new Date().toISOString().split('T')[0];
-  const scheduled = d.filter(x => x.DeliveryDate && x.DeliveryDate.split('T')[0] === today).length;
-  const ontheway = d.filter(x => x.DeliveryStatus === 'Out for Delivery').length;
-  const deliveredToday = d.filter(x => x.DeliveryDate && x.DeliveryDate.split('T')[0] === today && x.DeliveryStatus === 'Delivered').length;
-
-  document.getElementById('dt-scheduled').innerHTML = scheduled + '<span class="m-sub" style="font-size:11px;color:var(--text-muted)">today</span>';
-  document.getElementById('dt-ontheway').innerHTML = ontheway + '<span class="m-sub c-red" style="font-size:11px">active</span>';
-  document.getElementById('dt-delivered').innerHTML = deliveredToday + '<span class="m-sub c-green" style="font-size:11px">today</span>';
-
-  if (!d.length) {
-    document.getElementById('delivery-tbody').innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-muted)">No deliveries found</td></tr>';
-    return;
+async function renderDeliveryView() {
+  try {
+    document.getElementById('delivery-tbody').innerHTML = '<tr><td colspan="9"><div class="loading-wrap"><div class="spinner"></div></div></td></tr>';
+    
+    document.getElementById('dt-scheduled').textContent = '0';
+    document.getElementById('dt-ontheway').textContent = '0';
+    document.getElementById('dt-delivered').textContent = '0';
+    
+    document.getElementById('delivery-tbody').innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);font-size:14px">🚚 No deliveries yet — delivery records will appear here automatically</td></tr>';
+    
+  } catch(e) {
+    console.error('Delivery error:', e);
+    document.getElementById('delivery-tbody').innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--accent)">Error loading deliveries.</td></tr>';
   }
-  document.getElementById('delivery-tbody').innerHTML = d.map(x => {
-    const statusColor = DELIVERY_STATUS_COLORS[x.DeliveryStatus] || '#888';
-    return `<tr>
-      <td style="font-weight:600">${x.OrderID || '—'}</td>
-      <td>${x.CustomerName || 'Guest'}</td>
-      <td>${x.Phone || '—'}</td>
-      <td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${x.DeliveryAddress || '—'}</td>
-      <td>${x.DeliveryDate ? new Date(x.DeliveryDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'}</td>
-      <td><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:${statusColor}20;color:${statusColor}">${x.DeliveryStatus || 'Scheduled'}</span></td>
-      <td>${x.EstimatedTime || '—'}</td>
-      <td>${x.DriverName || '—'}</td>
-      <td><button class="btn-update" onclick="toggleDeliveryEdit('${x.id}')">Update</button></td>
-    </tr><tr><td colspan="9" style="padding:0"><div class="inline-edit" id="de-${x.id}"><div class="ie-grid"><div class="ie-f"><label class="ie-l">Delivery Status</label><select class="ie-i" id="de-status-${x.id}"><option>Scheduled</option><option>Out for Delivery</option><option>Delivered</option><option>Failed</option></select></div><div class="ie-f"><label class="ie-l">Driver Name</label><input class="ie-i" id="de-driver-${x.id}" value="${x.DriverName || ''}"></div><div class="ie-f"><label class="ie-l">ETA</label><input class="ie-i" id="de-eta-${x.id}" value="${x.EstimatedTime || ''}"></div></div><div class="ie-acts"><button class="ie-btn ie-btn-cancel" onclick="toggleDeliveryEdit('${x.id}')">Cancel</button><button class="ie-btn ie-btn-save" onclick="saveDeliveryEdit('${x.id}')">Save</button></div></div></td></tr>`;
-  }).join('');
 }
 
 function toggleDeliveryEdit(id) {
