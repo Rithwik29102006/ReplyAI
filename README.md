@@ -1,4 +1,4 @@
-# 🎂 ReplyAI — AI-Powered Customer Communication for Priya's Home Bakery
+# 🤖 ReplyAI — AI-Powered Customer Communication for Any Micro-SME Business
 
 > **Built for CodeQuest 2026** | SaaS / Communication Automation Track
 
@@ -7,6 +7,7 @@
 [![Airtable](https://img.shields.io/badge/Airtable-Database-18BFFF?style=for-the-badge)](https://airtable.com)
 [![Twilio](https://img.shields.io/badge/Twilio-WhatsApp%20API-F22F46?style=for-the-badge)](https://twilio.com)
 [![Groq](https://img.shields.io/badge/Groq-LLM%20AI-F55036?style=for-the-badge)](https://groq.com)
+[![Netlify](https://img.shields.io/badge/Netlify-Deployed-00C7B7?style=for-the-badge)](https://netlify.com)
 
 ---
 
@@ -14,7 +15,11 @@
 
 Micro-SME owners managing customer queries across **WhatsApp** and **Instagram** lose **3–5 hours/day** manually responding to repetitive messages, leading to **25–40% lead drop-offs** due to delayed replies.
 
-**Persona:** Digital-first micro-SME owners (Instagram/WhatsApp-led businesses like home bakeries, tiffin services, boutique shops)
+Whether it's a home bakery, tiffin service, boutique, salon, tuition center, or event decorator — the problem is identical. Same questions. Every single day. Price inquiries, booking requests, availability questions, delivery queries — all handled manually, one by one.
+
+The average response time for a solo micro-SME owner is **2–4 hours**. Customer expectation on WhatsApp is **under 5 minutes**. That gap is where businesses lose customers silently.
+
+**63 million micro-SMEs in India** operate primarily through WhatsApp and Instagram. Yet there is no affordable, intelligent auto-reply system built for them.
 
 **Core Problem:** Absence of a unified, intent-aware auto-reply system across multi-platform messaging results in lost conversions and poor customer experience.
 
@@ -22,16 +27,17 @@ Micro-SME owners managing customer queries across **WhatsApp** and **Instagram**
 
 ## 💡 Solution — ReplyAI
 
-ReplyAI is a **fully automated WhatsApp customer communication system** built specifically for Priya's Home Bakery, Hyderabad. It:
+ReplyAI is a **fully automated WhatsApp customer communication platform** that works for ANY micro-SME business. It features a business onboarding system that configures the AI for any business type in minutes.
 
-- **Auto-replies** to every customer message on WhatsApp instantly
-- **Classifies intent** (Price, Order, Delivery, Customization, etc.)
-- **Scores leads** from 1-10 based on buying intent
-- **Detects sentiment** (Happy, Neutral, Frustrated, Urgent)
-- **Sends order confirmations** automatically
+- **Auto-replies** to every WhatsApp message in under 5 seconds
+- **Classifies intent** — Price, Order, Delivery, Customization, Availability, Support
+- **Scores leads** from 1–10 based on buying intent
+- **Detects sentiment** — Happy, Neutral, Frustrated, Urgent
+- **Sends order confirmations** automatically on WhatsApp
 - **Notifies customers** at every order status update
-- **Follows up** with customers who asked about price but didn't order
-- **Shows live analytics** on a beautiful admin dashboard
+- **Follows up** on cold leads after 2 hours automatically
+- **Shows live analytics** on a beautiful multi-page admin dashboard
+- **Works for any business** — Bakery, Tiffin, Boutique, Salon, Tuition, Event Decorator
 
 ---
 
@@ -40,30 +46,39 @@ ReplyAI is a **fully automated WhatsApp customer communication system** built sp
 ```
 Customer WhatsApp Message
          ↓
-    Twilio Sandbox
+    Twilio Sandbox / Business Number
          ↓
     n8n Webhook Trigger
          ↓
     Normalize Payload
+    (Extract name, message, phone, platform)
          ↓
     Has Customer Message? (IF node)
          ↓
-    Groq AI (llama-3.3-70b-versatile)
-    ├── Classify Intent
-    ├── Generate Reply
+    Groq AI — llama-3.3-70b-versatile
+    ├── Classify Intent (6 types)
+    ├── Generate Contextual Reply
     ├── Score Lead (1-10)
     ├── Detect Sentiment
-    └── Estimate Order Value
+    └── Estimate Order Value (₹)
          ↓
     Parse AI Output (Code Node)
          ↓
-    Save to Airtable (Conversations)
+    Save to Airtable → Conversations Table
          ↓
-    Save to Airtable (Orders)
+    Save to Airtable → Orders Table
          ↓
-    Send WhatsApp Reply (Twilio)
+    Send WhatsApp Reply via Twilio
          ↓
-    Customer Receives AI Reply
+    Customer Receives AI Reply ✅
+
+------- PARALLEL WORKFLOWS -------
+
+Follow-up Engine (every 30 mins):
+Fetch cold leads → Generate follow-up → Send WhatsApp → Mark sent
+
+WhatsApp Notifier (admin triggered):
+Dashboard status update → n8n webhook → Twilio → Customer notified
 ```
 
 ---
@@ -71,46 +86,67 @@ Customer WhatsApp Message
 ## ✨ Features
 
 ### 🤖 AI-Powered Auto Replies
-- Instant responses to every WhatsApp message
-- Understands natural language (handles typos, short messages)
-- Responds in friendly, conversational Indian English
-- Handles 6 intent types: PRICE, ORDER, CUSTOMIZATION, DELIVERY, AVAILABILITY, SUPPORT
+- Instant responses to every WhatsApp message under 5 seconds
+- Understands natural language including typos and short messages
+- Responds in friendly conversational Indian English
+- Handles 6 intent types automatically
+- Menu auto-reply — customer sends "Menu" → full price list sent instantly
+
+### 🏪 Business Onboarding System
+- First-time setup wizard for any business type
+- Supports: Bakery, Tiffin Service, Boutique, Salon, Tuition Center, Event Decorator, Freelancer
+- Auto-generates AI system prompt based on business details
+- Dashboard branding updates to match business name instantly
+- Settings page to edit configuration anytime
 
 ### 📊 Lead Intelligence
-- **Lead Scoring (1-10):** Customers saying "I want to order" get score 8-10, price inquiries get 5-7
+- **Lead Scoring (1–10):** Every customer rated automatically
 - **Sentiment Detection:** Happy, Neutral, Frustrated, Urgent
-- **Revenue Pipeline:** Tracks estimated order value from each conversation
+- **Revenue Pipeline:** Estimated order value tracked per conversation
 - **Hot Leads:** Auto-flags customers with score ≥ 8 for priority follow-up
+- **Action Required:** Frustrated customers escalated immediately
 
-### 📦 Order Management
-- Orders automatically created in Airtable when customer places order
-- Admin can update order status from dashboard
-- Status updates trigger automatic WhatsApp notifications to customer:
-  - ✅ **Confirmed** → Order confirmation with details
-  - 🚚 **Out for Delivery** → ETA notification
-  - 🎉 **Delivered** → Thank you + feedback request
+### ✅ Order Confirmation on WhatsApp
+- Customer confirms order → WhatsApp confirmation sent automatically
+- Includes order details, price, delivery date, total amount
+- Zero manual effort from business owner
 
-### 🔄 Smart Follow-up System
-- Automatically detects customers who asked about price/availability but didn't order
-- Sends follow-up WhatsApp message after 2 hours
-- Recovers the 25-40% lead drop-off from delayed responses
-- Marks follow-up as sent to avoid duplicate messages
+### 🚚 Automatic Delivery Notifications
+Admin updates status in dashboard → Customer gets WhatsApp automatically:
+- **Confirmed** → "Your order is confirmed, we start soon!"
+- **Out for Delivery** → "Your order is on the way! 30–45 mins"
+- **Delivered** → "Delivered! Please share your feedback 🙏"
 
-### 📱 Menu Auto-Reply
-- Customer sends "Menu" → AI instantly sends full menu with prices
-- Menu includes all cakes, cupcakes, brownies with prices
-- Eggless availability highlighted
-- Delivery charges and area mentioned
+### 🔄 Smart Follow-up Engine
+- Detects customers who asked about price but didn't order
+- After 2 hours → automatic personalized WhatsApp follow-up
+- Directly recovers 25–40% lost leads
+- FollowUpSent tracked — no duplicate messages ever
 
-### 📈 Live Admin Dashboard
-- **Dashboard:** Real-time metrics, sentiment breakdown, action required alerts
-- **Analytics:** Intent charts, lead score distribution, sentiment analysis, message volume over time
-- **Menu & Stock:** Live inventory management, update quantities, add new items
-- **Orders:** Full order management with status updates
-- **Delivery:** Delivery tracking with driver assignment
-- **Customers:** Complete customer intelligence with search and export
-- **Marketing:** Hot leads, follow-up queue, quick reply templates
-- **Ingredients:** Bakery ingredient tracker with restock alerts
+### 📈 Live Admin Dashboard (8 Sections)
+| Section | What It Shows |
+|---------|--------------|
+| **Dashboard** | Real-time metrics, sentiment, alerts, message table |
+| **Analytics** | Intent charts, sentiment donut, lead scores, volume over time |
+| **Menu & Stock** | Live inventory, update quantities, add items, CSV export |
+| **Orders** | Full order management with one-click status updates |
+| **Delivery** | Delivery tracking with driver assignment and ETA |
+| **Customers** | Intelligence with search, sort by lead score, export |
+| **Marketing** | Hot leads, follow-up queue, quick reply templates |
+| **Ingredients** | Ingredient tracker with restock alerts |
+
+### 🎮 WhatsApp Simulator
+- Embedded WhatsApp-style chat interface in dashboard
+- Test AI responses live without a phone
+- Uses Groq API directly from browser
+- Shows intent badge below each AI reply
+- Adapts to business type from onboarding config
+
+### 📊 Impact Calculator
+- Floating "Impact" button on every page
+- Before vs After metrics side by side
+- Live ROI calculator with sliders
+- Calculates monthly revenue recovered and annual savings
 
 ---
 
@@ -118,12 +154,14 @@ Customer WhatsApp Message
 
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
-| **Workflow Automation** | [n8n](https://n8n.io) | Webhook processing, AI orchestration |
-| **AI/LLM** | [Groq](https://groq.com) (llama-3.3-70b-versatile) | Intent classification, reply generation |
+| **Workflow Automation** | [n8n](https://n8n.io) | Webhook processing, AI orchestration, scheduling |
+| **AI / LLM** | [Groq](https://groq.com) llama-3.3-70b | Intent classification, reply generation, follow-ups |
 | **Database** | [Airtable](https://airtable.com) | Conversations, Orders, Stock, Delivery |
-| **WhatsApp** | [Twilio](https://twilio.com) | Send/receive WhatsApp messages |
-| **Dashboard** | Vanilla HTML/CSS/JS | Admin interface |
+| **WhatsApp** | [Twilio](https://twilio.com) | Send/receive real WhatsApp messages |
+| **Dashboard** | Vanilla HTML / CSS / JS | Multi-page admin interface |
 | **Charts** | [Chart.js](https://chartjs.org) | Analytics visualizations |
+| **Icons** | [Remix Icons](https://remixicon.com) | UI icon set |
+| **Fonts** | [DM Sans](https://fonts.google.com) | Typography |
 | **Hosting** | [Netlify](https://netlify.com) | Dashboard deployment |
 
 ---
@@ -131,11 +169,23 @@ Customer WhatsApp Message
 ## 📁 Project Structure
 
 ```
-replyai-bakery/
-├── replyai_dashboard_v4.html    # Main admin dashboard (single file)
-├── README.md                    # This file
-└── assets/
-    └── screenshots/             # Demo screenshots
+replyai/
+├── index.html              # Main HTML — all views and modals
+├── css/
+│   └── styles.css          # All styling and CSS variables
+├── js/
+│   ├── config.js           # API tokens, table IDs, constants
+│   ├── api.js              # Airtable fetch/patch/create, loadData
+│   ├── dashboard.js        # Dashboard rendering, navigation
+│   ├── analytics.js        # All Chart.js charts
+│   ├── stock.js            # Stock management, add/update items
+│   ├── orders.js           # Order management, status updates
+│   ├── delivery.js         # Delivery tracking
+│   ├── customers.js        # Customer intelligence, search, export
+│   ├── marketing.js        # Hot leads, follow-up queue, templates
+│   ├── ingredients.js      # Ingredient tracker, restock alerts
+│   └── main.js             # Initialization, onboarding check
+└── README.md
 ```
 
 ---
@@ -145,23 +195,25 @@ replyai-bakery/
 ### Conversations Table
 | Field | Type | Description |
 |-------|------|-------------|
-| CustomerName | Text | Customer's WhatsApp name |
+| CustomerName | Text | Customer's WhatsApp display name |
 | Platform | Single Select | WhatsApp / Instagram |
-| Message | Long Text | Customer's message |
+| Message | Long Text | Customer's original message |
 | Intent | Single Select | PRICE/ORDER/CUSTOMIZATION/DELIVERY/AVAILABILITY/SUPPORT |
-| ReplySent | Long Text | AI-generated reply |
-| LeadScore | Number | 1-10 buying intent score |
+| ReplySent | Long Text | AI-generated reply sent to customer |
+| LeadScore | Number | 1–10 buying intent score |
 | Sentiment | Single Select | Happy/Neutral/Frustrated/Urgent |
 | OrderValue | Number | Estimated order value in ₹ |
-| Timestamp | Date | Message timestamp |
+| Timestamp | Date | Message timestamp with time |
 | Status | Single Select | New/Resolved/Escalated |
-| FollowUpSent | Checkbox | Whether follow-up was sent |
-| FollowUpTime | Date | When follow-up was sent |
+| FollowUpSent | Checkbox | Whether automated follow-up was sent |
+| FollowUpTime | Date | Timestamp of follow-up message |
+| BusinessType | Text | Business type for multi-tenant support |
+| BusinessName | Text | Business name for multi-tenant support |
 
 ### Stock Table
 | Field | Type | Description |
 |-------|------|-------------|
-| ProductName | Text | Cake/product name |
+| ProductName | Text | Product or service name |
 | Category | Single Select | Cake/Cupcake/Brownie/Cookie/Snack |
 | AvailableQty | Number | Current available quantity |
 | MaxQty | Number | Maximum capacity |
@@ -170,90 +222,104 @@ replyai-bakery/
 ### Orders Table
 | Field | Type | Description |
 |-------|------|-------------|
-| CustomerName | Text | Customer name |
-| CustomerPhone | Text | WhatsApp number |
+| OrderID | Formula | Auto-generated unique order ID |
+| CustomerName | Text | Customer name from WhatsApp |
+| CustomerPhone | Text | WhatsApp phone number |
 | Platform | Single Select | WhatsApp/Instagram |
-| CakeType | Text | Type of cake ordered |
+| CakeType | Text | Product or service ordered |
 | Size | Single Select | Half KG/1 KG/2 KG/Custom |
 | TotalPrice | Number | Order total in ₹ |
 | DeliveryAddress | Long Text | Delivery location |
 | DeliveryDate | Date | Requested delivery date |
 | OrderStatus | Single Select | Received/Confirmed/Baking/Out for Delivery/Delivered/Cancelled |
 | PaymentStatus | Single Select | Pending/Paid/Refunded |
+| SpecialInstructions | Long Text | Custom requirements from customer |
 
 ---
 
 ## 🔄 n8n Workflows
 
 ### Workflow 1: ReplyAI Main Inbound
-Handles all incoming WhatsApp messages:
-1. **Webhook** — receives Twilio POST
-2. **Normalize Payload** — extracts customerName, customerMessage, customerPhone
-3. **Has Customer Message** — IF node checks if message exists
-4. **Generate Intent via Groq** — calls Groq API with bakery system prompt
+1. **Webhook** — receives POST from Twilio when customer messages
+2. **Normalize Payload** — extracts customerName, message, phone, platform
+3. **Has Customer Message** — IF node filters empty messages
+4. **Generate Intent via Groq** — calls Groq with business system prompt
 5. **Parse Output** — extracts intent, reply, leadScore, sentiment, orderValue
-6. **Save to Airtable** — saves conversation record
-7. **Save to Orders** — creates order record
-8. **Send WhatsApp Reply** — sends AI reply via Twilio
+6. **Save to Conversations** — Airtable POST
+7. **Save to Orders** — Airtable POST to Orders table
+8. **Send WhatsApp Reply** — Twilio Messages API
+9. **Success Response** — returns 200 to Twilio
 
 ### Workflow 2: WhatsApp Notifier
-Handles admin-triggered WhatsApp notifications:
-1. **Webhook** — receives POST from dashboard
+1. **Webhook** (`/send-whatsapp`) — receives POST from dashboard
 2. **HTTP Request** — forwards to Twilio WhatsApp API
+3. Triggered on: Confirmed / Out for Delivery / Delivered status updates
 
 ### Workflow 3: Follow-up Engine
-Automated follow-up for unconverted leads:
 1. **Schedule Trigger** — runs every 30 minutes
-2. **Fetch Pending** — gets PRICE/AVAILABILITY conversations where FollowUpSent=false
-3. **Generate Follow-up** — Groq creates personalized follow-up message
-4. **Send WhatsApp** — sends via Twilio
-5. **Mark Sent** — updates FollowUpSent=true in Airtable
+2. **Fetch Pending** — Airtable filter: Intent=PRICE/AVAILABILITY, FollowUpSent=false, Timestamp > 2hrs
+3. **Loop Records** — Split in Batches
+4. **Generate Follow-up** — Groq creates personalized message
+5. **Send WhatsApp** — Twilio API
+6. **Mark Sent** — Airtable PATCH: FollowUpSent=true
 
 ---
 
 ## 🚀 Setup Instructions
 
-### Prerequisites
-- [n8n](https://n8n.io) account
-- [Airtable](https://airtable.com) account
-- [Twilio](https://twilio.com) account with WhatsApp sandbox
-- [Groq](https://console.groq.com) API key (free)
-
 ### Step 1: Airtable Setup
-1. Create base called `ReplyAI Bakery`
-2. Create tables: `Conversations`, `Stock`, `Orders`
-3. Get Base ID from URL
-4. Create Personal Access Token at [airtable.com/create/tokens](https://airtable.com/create/tokens)
-   - Scopes: `data.records:read`, `data.records:write`, `schema.bases:read`
+```
+1. Create base: "ReplyAI Bakery"
+2. Create tables: Conversations, Stock, Orders
+3. Add fields per schema above
+4. Get Base ID from URL: airtable.com/appXXXXX/...
+5. Create token: airtable.com/create/tokens
+   Scopes: data.records:read + data.records:write + schema.bases:read
+```
 
 ### Step 2: Groq API Key
-1. Sign up at [console.groq.com](https://console.groq.com)
-2. Create new API key — free tier is sufficient
+```
+1. Sign up: console.groq.com
+2. Create API key (free — 14,400 requests/day)
+```
 
 ### Step 3: Twilio WhatsApp Sandbox
-1. Sign up at [twilio.com](https://twilio.com)
-2. Go to Messaging → Try it out → Send a WhatsApp message
-3. Join sandbox: send `join <word>` to `+1 415 523 8886`
-4. Set webhook URL to your n8n webhook URL in Sandbox settings
+```
+1. Sign up: twilio.com
+2. Messaging → Try it out → Send a WhatsApp message
+3. Send "join <word>" to +1 415 523 8886 from your WhatsApp
+4. Set Sandbox webhook = your n8n production URL
+5. Method: HTTP POST
+```
 
-### Step 4: n8n Workflow
-1. Create workflow in n8n
+### Step 4: n8n Workflows
+```
+1. Create workflow: "ReplyAI Main Inbound"
 2. Add nodes per architecture above
-3. Configure Groq HTTP Request with API key
-4. Configure Twilio HTTP Request with Basic Auth (Account SID + Auth Token)
-5. Publish workflow
+3. Webhook path: replyai-meta-inbound
+4. Groq HTTP Request: Authorization: Bearer YOUR_GROQ_KEY
+5. Twilio HTTP Request: Basic Auth (Account SID + Auth Token)
+6. Publish → copy Production URL → paste in Twilio Sandbox settings
+```
 
-### Step 5: Dashboard
-1. Open `replyai_dashboard_v4.html`
-2. Update constants:
+### Step 5: Dashboard Config
 ```javascript
-const TOKEN = 'your_airtable_token';
-const BASE = 'your_base_id';
+// js/config.js
+const TOKEN = 'your_airtable_personal_access_token';
+const BASE = 'your_airtable_base_id';
 const CONV = 'your_conversations_table_id';
 const STOCK = 'your_stock_table_id';
 const ORDERS = 'your_orders_table_id';
+const WHATSAPP_WEBHOOK = 'https://your-n8n/webhook/send-whatsapp';
 ```
-3. Deploy to [Netlify Drop](https://netlify.com/drop)
+
+### Step 6: Deploy
+```
+1. Zip entire replyai folder
+2. Go to netlify.com/drop
+3. Drag and drop zip
+4. Get live URL instantly
+```
 
 ---
 
@@ -261,43 +327,49 @@ const ORDERS = 'your_orders_table_id';
 
 | Metric | Before ReplyAI | After ReplyAI |
 |--------|---------------|---------------|
-| Response Time | 2-4 hours | < 5 seconds |
-| Messages handled/day | 10-15 (manual) | Unlimited |
-| Lead drop-off rate | 25-40% | < 5% |
-| Hours saved/day | 0 | 3-5 hours |
-| Labour cost saved/day | 0 | ~₹950 |
+| Response Time | 2–4 hours | < 5 seconds |
+| Messages handled/day | 10–15 manual | Unlimited automated |
+| Lead drop-off rate | 25–40% | < 5% |
+| Hours saved/day | 0 | 3–5 hours |
+| Labour cost saved/day | ₹0 | ~₹950 |
 | Follow-up rate | 0% | 100% automated |
+| Revenue lost daily | ₹9,750 | ₹0 |
+| Monthly revenue recovered | ₹0 | ₹2,92,500 |
 
 ---
 
-## 🎯 Why This Stands Out
+## 🌍 Supported Business Types
 
-1. **Real WhatsApp integration** — actual messages sent/received via Twilio
-2. **Full-stack solution** — from AI reply → order management → delivery tracking
-3. **Live dashboard** — real-time Airtable data, updates every 30 seconds
-4. **Lead intelligence** — scoring + sentiment + revenue pipeline tracking
-5. **Follow-up automation** — directly solves the 25-40% lead drop-off problem
-6. **Stock management** — admin updates inventory, syncs instantly to Airtable
-7. **Customer notifications** — WhatsApp updates at every order stage
-8. **No-code backbone** — n8n + Airtable makes it maintainable by non-developers
+| Type | Use Case |
+|------|---------|
+| 🎂 Bakery | Cake orders, custom designs, delivery queries |
+| 🍱 Tiffin Service | Daily meal subscriptions, delivery scheduling |
+| 👗 Boutique | Product inquiries, availability, order booking |
+| ✂️ Salon | Appointment booking, service pricing |
+| 📚 Tuition Center | Admission inquiries, batch timings, fees |
+| 🎉 Event Decorator | Package pricing, availability, booking |
+| 💼 Freelancer | Service inquiries, quotations, scheduling |
 
 ---
 
 ## 🔗 Important Links
 
-- 🌐 **Live Dashboard:** [replyai-bakery.netlify.app](https://replyai-bakery.netlify.app)
-- 🤖 **n8n Documentation:** [docs.n8n.io](https://docs.n8n.io)
-- 🗄️ **Airtable API:** [airtable.com/developers](https://airtable.com/developers/web/api/introduction)
-- 📱 **Twilio WhatsApp Sandbox:** [twilio.com/docs/whatsapp/sandbox](https://www.twilio.com/docs/whatsapp/sandbox)
-- ⚡ **Groq Models:** [console.groq.com/docs/models](https://console.groq.com/docs/models)
-- 📊 **Chart.js Docs:** [chartjs.org/docs](https://www.chartjs.org/docs/latest/)
-- 🚀 **Netlify Deploy:** [netlify.com/drop](https://netlify.com/drop)
+| Resource | Link |
+|---------|------|
+| 🌐 Live Dashboard | [replyaibakery1.netlify.app](https://replyaibakery1.netlify.app/) |
+| 📱 Twilio WhatsApp Sandbox | [twilio.com/docs/whatsapp/sandbox](https://www.twilio.com/docs/whatsapp/sandbox) |
+| 🤖 n8n Documentation | [docs.n8n.io](https://docs.n8n.io) |
+| 🗄️ Airtable API Docs | [airtable.com/developers](https://airtable.com/developers/web/api/introduction) |
+| ⚡ Groq Models | [console.groq.com/docs/models](https://console.groq.com/docs/models) |
+| 📊 Chart.js Documentation | [chartjs.org/docs](https://www.chartjs.org/docs/latest/) |
+| 🚀 Deploy to Netlify | [netlify.com/drop](https://netlify.com/drop) |
 
 ---
 
-## 👨‍💻 Team
+## 👨‍💻 Builder
 
 **Rithwik Reddy** — CodeQuest 2026
+MECS, Hyderabad | SaaS / Communication Automation Track
 
 ---
 
@@ -307,4 +379,4 @@ MIT License — free to use as template for micro-SME automation
 
 ---
 
-*Built with ❤️ for CodeQuest 2026 — Making micro-SME communication effortless*
+*Built with ❤️ for CodeQuest 2026 — Making micro-SME communication effortless, one WhatsApp message at a time*
