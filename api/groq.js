@@ -3,6 +3,7 @@
 // and is never sent to the browser.
 
 const MAX_MESSAGE_CHARS = 2000;
+const MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
 
 export async function POST(req) {
   const apiKey = process.env.GROQ_API_KEY;
@@ -33,19 +34,22 @@ export async function POST(req) {
     return Response.json({ error: "Invalid messages" }, { status: 400 });
   }
 
-  // Model and limits are fixed here, so the endpoint can't be used for anything else.
+  const request = {
+    model: MODEL,
+    messages,
+    temperature: 0.7,
+    max_tokens: 400,
+  };
+  // gpt-oss models think before answering; keep that short so replies stay fast.
+  if (MODEL.startsWith("openai/gpt-oss")) request.reasoning_effort = "low";
+
   const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      model: "llama-3.3-70b-versatile",
-      messages,
-      temperature: 0.7,
-      max_tokens: 150,
-    }),
+    body: JSON.stringify(request),
   });
 
   const data = await groqRes.json().catch(() => ({}));
