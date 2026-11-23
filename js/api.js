@@ -22,7 +22,7 @@ async function fetchAll(tableId) {
   if (!tableId || tableId === 'tblYYYYY') return [];
   let records = [], offset = null;
   do {
-    const url = `https://api.airtable.com/v0/${BASE}/${tableId}?pageSize=100${offset ? '&offset=' + offset : ''}`;
+    const url = `${AIRTABLE_PROXY}?table=${tableId}${offset ? '&offset=' + encodeURIComponent(offset) : ''}`;
     const res = await fetchWithTimeout(url, { headers: H }, 8000);
     if (!res.ok) throw new Error('API ' + res.status);
     const data = await res.json();
@@ -34,7 +34,7 @@ async function fetchAll(tableId) {
 
 // Patch a record
 async function patchRecord(tableId, id, fields) {
-  const res = await fetch(`https://api.airtable.com/v0/${BASE}/${tableId}/${id}`, {
+  const res = await fetch(`${AIRTABLE_PROXY}?table=${tableId}&id=${id}`, {
     method: 'PATCH',
     headers: H,
     body: JSON.stringify({ fields })
@@ -45,7 +45,7 @@ async function patchRecord(tableId, id, fields) {
 
 // Create a new record
 async function createRecord(tableId, fields) {
-  const res = await fetch(`https://api.airtable.com/v0/${BASE}/${tableId}`, {
+  const res = await fetch(`${AIRTABLE_PROXY}?table=${tableId}`, {
     method: 'POST',
     headers: H,
     body: JSON.stringify({ records: [{ fields }] })
@@ -89,17 +89,9 @@ async function loadData() {
 }
 
 // Send WhatsApp message
+// Live WhatsApp sending (Twilio via n8n) is turned off in this demo deployment.
+// Order status changes still update Airtable; the message is only logged.
 async function sendWhatsApp(phone, message) {
   if (!phone) return;
-  const to = phone.startsWith('whatsapp:') ? phone : 'whatsapp:+91' + phone.replace(/\D/g, '');
-  try {
-    const res = await fetch('https://rithwikreddy.app.n8n.cloud/webhook/send-whatsapp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ to: to, message: message })
-    });
-    console.log('WhatsApp sent:', res.status);
-  } catch (e) {
-    console.error('WhatsApp failed:', e);
-  }
+  console.log('[demo] WhatsApp message not sent (live sending disabled):', phone, message);
 }

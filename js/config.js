@@ -1,13 +1,13 @@
-const TOKEN = 'airtable';
 const BASE = 'appq0ev1rvBz2jLAy';
 const CONV = 'tblHBMLHsz6XBKmyZ';
 const STOCK = 'tblYKh6qPeuuhbxVB';
 const ORDERS = 'tblNBHONiupSnyX2g';
 const DELIVERY = 'tblNBHONiupSnyX2g';
-const H = {'Authorization':'Bearer '+TOKEN,'Content-Type':'application/json'};
+// Airtable is reached through /api/airtable; the token stays on the server.
+const AIRTABLE_PROXY = '/api/airtable';
+const H = {'Content-Type':'application/json'};
 const ICOLORS = {PRICE:'#5A4FCF',ORDER:'#B23D22',CUSTOMIZATION:'#9C3558',DELIVERY:'#197280',AVAILABILITY:'#208754',SUPPORT:'#C5221F'};
 const CATICONS = {Cake:'🎂',Cupcake:'🧁',Brownie:'🍫',Cookie:'🍪',Snack:'🥐',GENERAL:'📦'};
-const WHATSAPP_WEBHOOK = 'https://rithwikreddy.app.n8n.cloud/webhook/send-whatsapp';
 const INGREDIENTS = [
   {name:'Flour',usedIn:'Sourdough, Croissant',status:'In Stock'},
   {name:'Butter',usedIn:'Croissant, Cakes',status:'Low Stock'},

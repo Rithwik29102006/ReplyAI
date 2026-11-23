@@ -52,7 +52,6 @@ const DEFAULT_PRODUCTS = {
 };
 
 // Sample Groq API key
-let groqApiKey = 'gsk_T1cjz5M3sXvUU0wzMrMBWGdyb3FYXkh';
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
@@ -345,12 +344,6 @@ function updateROI() {
 }
 
 // WhatsApp Simulator functions
-function saveGroqKey() {
-  groqApiKey = document.getElementById('groq-api-key').value;
-  localStorage.setItem('groqApiKey', groqApiKey);
-  toast('API Key saved!');
-}
-
 function handleChatKeypress(e) {
   if (e.key === 'Enter') {
     sendChatMessage();
@@ -420,7 +413,6 @@ function hideTypingIndicator() {
 }
 
 async function callGroqAPI(userMessage) {
-  const apiKey = document.getElementById('groq-api-key').value || groqApiKey;
   
   const businessName = localStorage.getItem('businessName') || "Priya's Home Bakery";
   const businessType = localStorage.getItem('businessType') || 'Bakery';
@@ -436,18 +428,11 @@ async function callGroqAPI(userMessage) {
   ];
 
   try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    // Calls our Vercel Function; the Groq key never reaches the browser.
+    const response = await fetch('/api/groq', {
       method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + apiKey,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: messages,
-        temperature: 0.7,
-        max_tokens: 150
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages })
     });
 
     hideTypingIndicator();
@@ -455,14 +440,14 @@ async function callGroqAPI(userMessage) {
     if (!response.ok) {
       const err = await response.text();
       console.error('Groq error:', err);
-      addChatBubble('API error: ' + response.status + '. Check your Groq API key.', 'ai');
+      addChatBubble('AI is unavailable right now (error ' + response.status + '). Please try again.', 'ai');
       return;
     }
 
     const data = await response.json();
 
-    if (data.choices && data.choices[0]) {
-      const reply = data.choices[0].message.content;
+    if (data.reply) {
+      const reply = data.reply;
       addChatBubble(reply, 'ai');
 
       // Detect intent
@@ -593,15 +578,6 @@ function saveSettings() {
   
   loadBusinessConfig();
   
-  // Update config.js values
-  if (document.getElementById('settings-airtable-token').value) {
-    localStorage.setItem('airtableToken', document.getElementById('settings-airtable-token').value);
-    localStorage.setItem('baseId', document.getElementById('settings-base-id').value);
-    localStorage.setItem('convTableId', document.getElementById('settings-conv-table').value);
-    localStorage.setItem('stockTableId', document.getElementById('settings-stock-table').value);
-    localStorage.setItem('ordersTableId', document.getElementById('settings-orders-table').value);
-    localStorage.setItem('whatsappWebhook', document.getElementById('settings-webhook').value);
-  }
   
   // Update current config values (will take effect on refresh)
   toast('Settings saved! Changes will take effect on next load.');
@@ -629,7 +605,6 @@ window.launchDashboard = launchDashboard;
 window.openImpactScreen = openImpactScreen;
 window.closeImpactScreen = closeImpactScreen;
 window.updateROI = updateROI;
-window.saveGroqKey = saveGroqKey;
 window.handleChatKeypress = handleChatKeypress;
 window.sendQuickMessage = sendQuickMessage;
 window.sendChatMessage = sendChatMessage;
